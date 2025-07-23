@@ -2,8 +2,10 @@ package com.jobms.job;
 
 import java.util.List;
 
+import com.jobms.job.dto.JobCompanyDTO;
+
 public interface JobService {
-    List<Job> findAll();
+    List<JobCompanyDTO> findAll();
     void createJob(Job job);
 
     Job getJobById(Long id);
