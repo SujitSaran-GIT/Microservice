@@ -1,6 +1,9 @@
 package com.jobms.job.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,6 +12,8 @@ import com.jobms.job.JobRepository;
 import com.jobms.job.JobService;
 import com.jobms.job.dto.JobCompanyDTO;
 import com.jobms.job.external.Company;
+import com.jobms.job.external.Review;
+import com.jobms.job.mapper.JobMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +36,24 @@ public class JobServiceImpl implements JobService {
         List<JobCompanyDTO> jobCompanyDTOs = new ArrayList<>();
 
         for (Job job : jobs) {
-            JobCompanyDTO jobCompanyDTO = new JobCompanyDTO();
-            jobCompanyDTO.setJob(job);
-
+            JobCompanyDTO jobCompanyDTO;
             try {
                 Company company = restTemplate.getForObject(
-                        "http://localhost:8082/company/" + job.getCompanyId(),
+                        "http://COMPANYMS:8082/company/" + job.getCompanyId(),
                         Company.class);
-                jobCompanyDTO.setCompany(company);
+                
+                ResponseEntity<List<Review>> reviewResponse = restTemplate.exchange("http://REVIEWMS:8084/reviews?companyId="+job.getCompanyId(),HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Review>>() {});
+
+                List<Review> reviews = reviewResponse.getBody();
+
+                
+                jobCompanyDTO = JobMapper.mapToJobCompanyDTO(job, company, reviews);
+                // jobCompanyDTO.setCompany(company);
             } catch (Exception e) {
                 System.err.println("Error fetching company for job ID " + job.getId() + ": " + e.getMessage());
-                jobCompanyDTO.setCompany(null); // or a dummy object
+                jobCompanyDTO = JobMapper.mapToJobCompanyDTO(job, null, null);
             }
 
             jobCompanyDTOs.add(jobCompanyDTO);
