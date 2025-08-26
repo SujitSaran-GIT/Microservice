@@ -17,6 +17,10 @@ import com.jobms.job.external.Company;
 import com.jobms.job.external.Review;
 import com.jobms.job.mapper.JobMapper;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +42,23 @@ public class JobServiceImpl implements JobService {
     
     private ReviewClient reviewClient;
 
+    int attempt = 0;
+
     public JobServiceImpl(CompanyClient companyClient, ReviewClient reviewClient) {
         this.companyClient = companyClient;
         this.reviewClient = reviewClient;
     }
 
     @Override
+    // @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+
+    // @Retry(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+
+    @RateLimiter(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+
+    
     public List<JobCompanyDTO> findAll() {
+        System.out.println("Attempt: " + (++attempt));
         List<Job> jobs = jobRepository.findAll();
         List<JobCompanyDTO> jobCompanyDTOs = new ArrayList<>();
 
@@ -84,6 +98,12 @@ public class JobServiceImpl implements JobService {
         }
 
         return jobCompanyDTOs;
+    }
+
+    public List<String> companyBreakerFallback() {
+        List<String> fallbackResponse = new ArrayList<>();
+        fallbackResponse.add("dummy");
+        return fallbackResponse;
     }
 
     @Override
