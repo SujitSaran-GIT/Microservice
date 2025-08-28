@@ -1,5 +1,266 @@
 # version: '3.8'
 
+# services:
+#   job-db:
+#     image: postgres:15
+#     container_name: job-db
+#     environment:
+#       POSTGRES_DB: jobdb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: Saran@2002
+#     ports:
+#       - "5435:5432"
+#     volumes:
+#       - job-data:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   company-db:
+#     image: postgres:15
+#     container_name: company-db
+#     environment:
+#       POSTGRES_DB: companydb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: Saran@2002
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - company-data:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   review-db:
+#     image: postgres:15
+#     container_name: review-db
+#     environment:
+#       POSTGRES_DB: reviewdb
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: Saran@2002
+#     ports:
+#       - "5434:5432"
+#     volumes:
+#       - review-data:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+  
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     container_name: rabbitmq
+#     ports:
+#       - "5672:5672"
+#       - "15672:15672"
+#     environment:
+#       RABBITMQ_DEFAULT_USER: guest
+#       RABBITMQ_DEFAULT_PASS: guest
+#     volumes:
+#       - rabbitmq-data:/var/lib/rabbitmq
+#     healthcheck:
+#       test: ["CMD", "rabbitmqctl", "status"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   zipkin:
+#     build:
+#       context: .
+#       dockerfile: zipkin/Dockerfile
+#     container_name: zipkin
+#     ports:
+#       - "9411:9411"
+
+#   servicems:
+#     build:
+#       context: ./servicems
+#     container_name: servicems
+#     ports:
+#       - "8761:8761"
+#     environment:
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#     depends_on:
+#       zipkin:
+#         condition: service_started
+
+#   companyms:
+#     build:
+#       context: ./companyms
+#     container_name: companyms
+#     ports:
+#       - "8081:8081"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://company-db:5432/companydb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#       # SPRING_RABBITMQ_HOST: rabbitmq
+#       # SPRING_RABBITMQ_PORT: 5672
+#       # SPRING_RABBITMQ_USERNAME: guest
+#       # SPRING_RABBITMQ_PASSWORD: guest
+#     depends_on:
+#       company-db:
+#         condition: service_healthy
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+#       # rabbitmq:
+#       #   condition: service_healthy
+
+#   jobms:
+#     build:
+#       context: ./jobms
+#     container_name: jobms
+#     ports:
+#       - "8082:8082"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://job-db:5432/jobdb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#       # SPRING_RABBITMQ_HOST: rabbitmq
+#       # SPRING_RABBITMQ_PORT: 5672
+#       # SPRING_RABBITMQ_USERNAME: guest
+#       # SPRING_RABBITMQ_PASSWORD: guest
+#     depends_on:
+#       job-db:
+#         condition: service_healthy
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+#       # rabbitmq:
+#       #   condition: service_healthy
+
+#   reviewms:
+#     build:
+#       context: ./reviewms
+#     container_name: reviewms
+#     ports:
+#       - "8084:8084"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://review-db:5432/reviewdb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#       # SPRING_RABBITMQ_HOST: rabbitmq
+#       # SPRING_RABBITMQ_PORT: 5672
+#       # SPRING_RABBITMQ_USERNAME: guest
+#       # SPRING_RABBITMQ_PASSWORD: guest
+#     depends_on:
+#       review-db:
+#         condition: service_healthy
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+#       # rabbitmq:
+#       #   condition: service_healthy
+
+# volumes:
+#   job-data:
+#   company-data:
+#   review-data:
+#   rabbitmq-data:
+
+
+
+
+# services:
+#   zipkin:
+#     build:
+#       context: .
+#       dockerfile: zipkin/Dockerfile
+#     container_name: zipkin
+#     ports:
+#       - "9411:9411"
+
+#   servicems:
+#     build:
+#       context: ./servicems
+#     container_name: servicems
+#     ports:
+#       - "8761:8761"
+#     environment:
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#     depends_on:
+#       zipkin:
+#         condition: service_started
+
+#   companyms:
+#     build:
+#       context: ./companyms
+#     container_name: companyms
+#     ports:
+#       - "8081:8081"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/companydb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#     depends_on:
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+
+#   jobms:
+#     build:
+#       context: ./jobms
+#     container_name: jobms
+#     ports:
+#       - "8082:8082"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jobdb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#     depends_on:
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+
+#   reviewms:
+#     build:
+#       context: ./reviewms
+#     container_name: reviewms
+#     ports:
+#       - "8084:8084"
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/reviewdb
+#       SPRING_DATASOURCE_USERNAME: postgres
+#       SPRING_DATASOURCE_PASSWORD: Saran@2002
+#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
+#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
+#     depends_on:
+#       zipkin:
+#         condition: service_started
+#       servicems:
+#         condition: service_started
+
+# volumes:
+#   job-data:
+#   company-data:
+#   review-data:
+
+
+version: '3.8'
+
 services:
   job-db:
     image: postgres:15
@@ -48,6 +309,23 @@ services:
       - review-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672"  # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -137,87 +415,4 @@ volumes:
   job-data:
   company-data:
   review-data:
-
-
-
-
-# services:
-#   zipkin:
-#     build:
-#       context: .
-#       dockerfile: zipkin/Dockerfile
-#     container_name: zipkin
-#     ports:
-#       - "9411:9411"
-
-#   servicems:
-#     build:
-#       context: ./servicems
-#     container_name: servicems
-#     ports:
-#       - "8761:8761"
-#     environment:
-#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
-#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
-#     depends_on:
-#       zipkin:
-#         condition: service_started
-
-#   companyms:
-#     build:
-#       context: ./companyms
-#     container_name: companyms
-#     ports:
-#       - "8081:8081"
-#     environment:
-#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/companydb
-#       SPRING_DATASOURCE_USERNAME: postgres
-#       SPRING_DATASOURCE_PASSWORD: Saran@2002
-#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
-#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
-#     depends_on:
-#       zipkin:
-#         condition: service_started
-#       servicems:
-#         condition: service_started
-
-#   jobms:
-#     build:
-#       context: ./jobms
-#     container_name: jobms
-#     ports:
-#       - "8082:8082"
-#     environment:
-#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jobdb
-#       SPRING_DATASOURCE_USERNAME: postgres
-#       SPRING_DATASOURCE_PASSWORD: Saran@2002
-#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
-#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
-#     depends_on:
-#       zipkin:
-#         condition: service_started
-#       servicems:
-#         condition: service_started
-
-#   reviewms:
-#     build:
-#       context: ./reviewms
-#     container_name: reviewms
-#     ports:
-#       - "8084:8084"
-#     environment:
-#       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/reviewdb
-#       SPRING_DATASOURCE_USERNAME: postgres
-#       SPRING_DATASOURCE_PASSWORD: Saran@2002
-#       SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
-#       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://servicems:8761/eureka/
-#     depends_on:
-#       zipkin:
-#         condition: service_started
-#       servicems:
-#         condition: service_started
-
-# volumes:
-#   job-data:
-#   company-data:
-#   review-data:
+  rabbitmq-data:

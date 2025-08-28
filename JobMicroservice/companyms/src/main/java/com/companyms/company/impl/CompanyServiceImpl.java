@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.companyms.company.Company;
 import com.companyms.company.CompanyRepository;
 import com.companyms.company.CompanyService;
+import com.companyms.company.clients.ReviewClient;
+import com.companyms.company.dto.ReviewMessage;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +18,11 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository) {
+    private ReviewClient reviewClient;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, ReviewClient reviewClient) {
         this.companyRepository = companyRepository;
+        this.reviewClient = reviewClient;
     }
 
     @Override
@@ -59,6 +64,13 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.findById(id).orElse(null);
     }
 
-    
+    @Override
+    public void updateCompanyRating(ReviewMessage reviewMessage) {
+        System.out.println(reviewMessage.getDescription());
+        Company company = companyRepository.findById(reviewMessage.getCompanyId()).orElse(null);
 
+        double averageRating = reviewClient.getAverageReview(reviewMessage.getCompanyId());
+        company.setRating(averageRating);
+        companyRepository.save(company);
+    }
 }

@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.reviewms.review.messaging.ReviewMessageProducer;
+
 import java.util.List;
 
 @RestController
@@ -12,16 +14,20 @@ import java.util.List;
 public class ReviewController {
 
     @Autowired
-    ReviewService reviewService;
+    private ReviewService reviewService;
 
-    public ReviewController(ReviewService reviewService) {
+    private ReviewMessageProducer reviewMessageProducer;
+
+    public ReviewController(ReviewService reviewService, ReviewMessageProducer reviewMessageProducer) {
         this.reviewService = reviewService;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @PostMapping
     public ResponseEntity<String> createReview(@RequestParam Long companyId, @RequestBody Review review){
         boolean isCreated = reviewService.createReview(companyId, review);
         if (isCreated){
+            reviewMessageProducer.sendReviewMessage(review);
             return new ResponseEntity<>("Review added successful",HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Review can't added",HttpStatus.NOT_FOUND);
@@ -68,5 +74,15 @@ public class ReviewController {
         } else {
             return new ResponseEntity<>("Review can't found",HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/average")
+    public Double getAverageReview(@RequestParam Long companyId){
+        List<Review> reviewList = reviewService.getAllReviews(companyId);
+
+        return reviewList.stream()
+                .mapToDouble(Review::getRating)
+                .average()
+                .orElse(0.0);
     }
 }
